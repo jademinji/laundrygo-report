@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>런드리고패스 — 가격·혜택 구조 제안</title>
+<style>
+:root{
+  --canvas:#ffffff;--parchment:#f5f5f7;--pearl:#fafafc;
+  --ink:#1d1d1f;--ink-80:#333333;--ink-48:#7a7a7a;
+  --hairline:#e0e0e0;--divider-soft:#f0f0f0;
+  --tile:#272729;--accent:#0066cc;--accent-on-dark:#2997ff;--accent-l:rgba(0,102,204,0.08);
+  --up:#1d9e75;--up-l:rgba(29,158,117,0.10);
+  --dn:#d85a30;--dn-l:rgba(216,90,48,0.09);
+  --amber:#9a6a11;--amber-l:rgba(154,106,17,0.10);
+  --purple:#5b53c6;--purple-l:rgba(91,83,198,0.10);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display','Apple SD Gothic Neo','Pretendard',system-ui,sans-serif;
+  background:var(--canvas);color:var(--ink);line-height:1.47;-webkit-font-smoothing:antialiased;letter-spacing:-0.01em;}
+.page{max-width:980px;margin:0 auto;padding:64px 40px 100px;}
+.top-bar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:44px;padding-bottom:20px;border-bottom:1px solid var(--hairline);}
+.brand{font-size:12px;font-weight:600;color:var(--ink-48);}
+.brand .sub{display:block;font-weight:400;margin-top:4px;}
+.meta{font-size:12px;color:var(--ink-48);text-align:right;line-height:1.7;}
+.h1{font-size:46px;font-weight:600;line-height:1.07;letter-spacing:-.022em;margin-bottom:18px;}
+.lead{font-size:18px;font-weight:400;color:var(--ink-80);line-height:1.55;margin-bottom:22px;letter-spacing:-.01em;}
+.lead b{font-weight:600;color:var(--ink);}
+.draft-pill{display:inline-block;font-size:12px;font-weight:600;color:var(--accent);background:var(--accent-l);border-radius:9999px;padding:5px 14px;margin-bottom:18px;}
+.claim{border-radius:18px;padding:24px 28px;margin-bottom:24px;background:var(--accent-l);border:1px solid rgba(0,102,204,.18);}
+.claim-lbl{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:10px;}
+.claim-txt{font-size:16px;line-height:1.7;color:var(--ink-80);}
+.claim-txt b{font-weight:600;color:var(--ink);}
+.toc{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+.toc-item{font-size:13px;color:var(--ink-80);background:var(--parchment);border-radius:9999px;padding:7px 15px;}
+.toc-item b{color:var(--accent);font-weight:600;}
+.note{background:var(--parchment);border:1px solid var(--hairline);border-radius:14px;padding:16px 18px;font-size:13px;color:var(--ink-80);line-height:1.65;margin-bottom:8px;}
+.note b{font-weight:600;color:var(--ink);}
+.part-head{margin:0 0 32px;padding:38px 36px;background:var(--tile);border-radius:18px;color:#fff;}
+.part-num{font-size:13px;font-weight:600;color:var(--accent-on-dark);margin-bottom:10px;}
+.part-title{font-size:28px;font-weight:600;letter-spacing:-.02em;margin-bottom:12px;line-height:1.14;color:#fff;}
+.part-desc{font-size:16px;color:#cccccc;line-height:1.55;letter-spacing:-.01em;}
+.part-desc b{color:#fff;font-weight:600;}
+.part-divider{border:none;border-top:1px solid var(--hairline);margin:60px 0 40px;}
+.divider{border:none;border-top:1px solid var(--divider-soft);margin:40px 0;}
+.sec-label{font-size:14px;font-weight:600;color:var(--ink);padding-bottom:11px;border-bottom:1px solid var(--hairline);margin-bottom:22px;display:flex;align-items:center;gap:10px;}
+.sec-label span.num{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 7px;background:var(--accent);color:#fff;border-radius:9999px;font-size:11px;font-weight:600;}
+p.body{font-size:15px;color:var(--ink-80);line-height:1.75;margin-bottom:16px;}
+p.body b{color:var(--ink);font-weight:600;}
+.kpi-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+.kpi-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;}
+@media(max-width:640px){.kpi-4,.kpi-3{grid-template-columns:repeat(2,1fr)}}
+.kc{background:var(--canvas);border:1px solid var(--hairline);border-radius:18px;padding:18px 20px;}
+.kc-l{font-size:12px;color:var(--ink-48);margin-bottom:6px;line-height:1.4;}
+.kc-v{font-size:23px;font-weight:600;line-height:1.15;letter-spacing:-.02em;}
+.kc-s{font-size:12px;color:var(--ink-80);margin-top:5px;line-height:1.4;}
+.up{color:var(--up);}.dn{color:var(--dn);}.am{color:var(--amber);}.blu{color:var(--accent);}.pu{color:var(--purple);}
+.box{background:var(--canvas);border:1px solid var(--hairline);border-radius:18px;padding:22px 24px;margin-bottom:14px;}
+.ct{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:14px;letter-spacing:-.01em;}
+.cn{font-size:12px;color:var(--ink-48);margin-top:10px;line-height:1.5;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+@media(max-width:620px){.two-col{grid-template-columns:1fr;}}
+.ins{border-left:3px solid var(--accent);background:var(--parchment);border-radius:0 12px 12px 0;padding:16px 20px;font-size:15px;color:var(--ink-80);line-height:1.65;margin-bottom:12px;}
+.ins.dn{border-left-color:var(--dn);}.ins.am{border-left-color:var(--amber);}.ins.up{border-left-color:var(--up);}.ins.pu{border-left-color:var(--purple);}
+.ins b{color:var(--ink);font-weight:600;}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-bottom:8px;}
+th{font-size:12px;font-weight:600;color:var(--ink-48);padding:10px 12px;text-align:left;border-bottom:1px solid var(--hairline);}
+td{padding:12px;border-bottom:1px solid var(--divider-soft);color:var(--ink-80);vertical-align:top;line-height:1.5;}
+td.lbl{font-weight:600;color:var(--ink);}
+tr:last-child td{border-bottom:none;}
+.hl{background:var(--accent-l);}
+.tag{display:inline-block;font-size:11px;font-weight:600;padding:2px 9px;border-radius:9999px;}
+.t-g{background:var(--up-l);color:var(--up);}.t-a{background:var(--amber-l);color:var(--amber);}.t-r{background:var(--dn-l);color:var(--dn);}
+.road-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+@media(max-width:640px){.road-grid{grid-template-columns:1fr;}}
+.flow-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0 14px;}
+.flow-box{background:var(--parchment);border-radius:12px;padding:12px 16px;text-align:center;flex:1;min-width:120px;}
+.flow-box .fb-t{font-size:13px;font-weight:600;color:var(--ink);}
+.flow-box .fb-s{font-size:11px;color:var(--ink-48);margin-top:3px;}
+.flow-arr{color:var(--accent);font-size:18px;font-weight:700;}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="top-bar">
+  <div class="brand">런드리고 · 멤버십 제안<span class="sub">런드리고패스</span></div>
+  <div class="meta">
+    가격·혜택 구조 제안<br>
+    타깃: 자유이용 월 1~2회 고객<br>
+    2026.06
+  </div>
+</div>
+
+<div style="margin-bottom:30px;">
+  <span class="draft-pill">제안서 v1 · 검토용</span>
+  <p class="h1">런드리고패스 — 가격·혜택 구조 제안</p>
+  <p class="lead">
+    런드리고패스는 회비 수익이 목적인 상품이 아니라, <b>자유이용 고객의 이용 빈도를 높이고 장기적으로 구독 전환을 유도하는 라이트 멤버십</b>입니다.
+    핵심 제안은 <b>월 3,300원(배송비 3,800원보다 낮게)</b>, <b>무료배송 1장 + 세탁비 10% 할인 1장(+ 패스 전용 시즌 쿠폰)</b> 구조입니다.
+  </p>
+  <div class="toc">
+    <span class="toc-item"><b>01</b> 기본 방향</span>
+    <span class="toc-item"><b>02</b> 가격 — 왜 3,300원</span>
+    <span class="toc-item"><b>03</b> 혜택 구조 & 쿠폰 운영</span>
+    <span class="toc-item"><b>04</b> 시즌 쿠폰 & 구독 전환 넛지</span>
+    <span class="toc-item"><b>05</b> 성과 지표</span>
+    <span class="toc-item"><b>06</b> 최종 제안</span>
+  </div>
+</div>
+
+<div class="claim">
+  <div class="claim-lbl">한 줄 정의</div>
+  <div class="claim-txt">
+    런드리고패스는 <b>자유이용 고객의 배송비 부담을 낮추고, 반복 이용을 유도하며, 장기적으로 구독 전환을 만들어내는 라이트 멤버십</b>입니다.
+    구독을 잠식하는 것이 아니라, <b>월 1회 → 월 2회 → 구독으로 올려보내는 브릿지</b>입니다.
+  </div>
+</div>
+
+<hr class="part-divider">
+
+<!-- 01 -->
+<div class="part-head">
+  <div class="part-num">Section 01 · 기본 방향</div>
+  <div class="part-title">무엇을 위한 패스인가 — 회비가 아니라 "행동 변화"</div>
+  <div class="part-desc">핵심 타깃은 구독 고객·헤비유저가 아니라 <b>월 1~2회 자유이용 고객</b>입니다. 구독은 부담스럽지만, 배송비·할인 혜택이 있으면 반복 이용을 늘릴 여지가 있는 층입니다.</div>
+</div>
+
+<div class="kpi-4">
+  <div class="kc"><div class="kc-l">자유이용 월 1회 비중</div><div class="kc-v dn">77.6%</div><div class="kc-s">4월 기준 33,548명 — 핵심 타깃</div></div>
+  <div class="kc"><div class="kc-l">자유이용 평균 세탁금액</div><div class="kc-v">38,403원</div><div class="kc-s">중앙값 30,500원</div></div>
+  <div class="kc"><div class="kc-l">저단가 첫주문 6개월 재이용</div><div class="kc-v up">54%</div><div class="kc-s">평균 3.0회 — "금방 안 떠남"</div></div>
+  <div class="kc"><div class="kc-l">현재 단일 배송비</div><div class="kc-v">3,800원</div><div class="kc-s">회비 비교 기준점</div></div>
+</div>
+
+<div class="box">
+  <div class="ct">런드리고패스가 해야 할 5가지 역할</div>
+  <table>
+    <tbody>
+      <tr><td class="lbl">① 진입장벽 완화</td><td>첫 이용 또는 월 1회 이용의 배송비 부담을 낮춤</td></tr>
+      <tr><td class="lbl">② 빈도 상승</td><td><b>월 1회 고객을 월 2회로</b> 끌어올림 (가장 중요)</td></tr>
+      <tr><td class="lbl">③ 이탈 방지</td><td>자유이용 고객을 멤버십으로 묶어 리텐션</td></tr>
+      <tr><td class="lbl">④ 구독 브릿지</td><td>구독 전환 전 단계 — 잠식이 아니라 승급 경로</td></tr>
+      <tr><td class="lbl">⑤ CRM 명분</td><td>쿠폰·시즌 혜택으로 정기 메시지 발송의 명확한 이유 제공</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="ins">
+  <b>데이터가 타깃을 뒷받침합니다.</b> 자유이용의 <b>77.6%가 월 1회</b> 이용자이고, 저단가(소액) 첫주문 고객도 6개월 내 <b>54%가 재이용·평균 3회</b> 주문합니다. "월 1~2회 = 곧 떠날 고객"이 아니라 <b>조금만 밀어주면 빈도가 오를 수 있는 층</b>이라는 뜻 — 패스의 타깃이 정확합니다.
+</div>
+
+<hr class="part-divider">
+
+<!-- 03 -->
+<div class="part-head">
+  <div class="part-num">Section 02 · 가격</div>
+  <div class="part-title">왜 3,300원인가 — "배송비보다 싼 멤버십"</div>
+  <div class="part-desc">가입 순간 고객이 가장 먼저 비교하는 건 복잡한 총 혜택액이 아니라 <b>월 회비 vs 배송비 1회(3,800원)</b>입니다. 그래서 회비는 배송비보다 <b>낮아야</b> 하고, 동시에 <b>"배송비가 비싸다"는 인식 자체를 패스가 상쇄</b>해야 합니다.</div>
+</div>
+
+<div class="box">
+  <div class="ct">경쟁사 멤버십 — "바로 계산되고, 이득이어야 가입한다"</div>
+  <table>
+    <thead><tr><th>서비스</th><th>월 구독료</th><th>핵심 혜택</th><th>유저가 느끼는 이득</th></tr></thead>
+    <tbody>
+      <tr><td class="lbl">컬리멤버스</td><td>1,900원</td><td>2,000원 적립 즉시 지급</td><td>가입 즉시 +100원 — 0초 계산</td></tr>
+      <tr><td class="lbl">배민클럽</td><td>3,990원</td><td>무료배달</td><td>배달 몇 번이면 회비 회수</td></tr>
+      <tr><td class="lbl">쿠팡 와우</td><td>7,890원</td><td>로켓배송 무료 등</td><td>월 3회+ 무배면 이득</td></tr>
+      <tr class="hl"><td class="lbl">세탁특공대 세특패스</td><td>5,900원</td><td>무제한 15% 할인</td><td>월 1회만 써도 본전 이상</td></tr>
+      <tr style="background:var(--accent-l)"><td class="lbl">런드리고패스(제안)</td><td><b>3,300원</b><br><span style="font-size:11px;color:var(--ink-48)">정가 5,900 → 현재</span></td><td>무료배송 1장 + 10% 1장</td><td><b>1회 +500원 · "배송비보다 싼 멤버십"</b></td></tr>
+    </tbody>
+  </table>
+  <div class="cn">* 공통 원칙: 가입 순간 고객은 복잡한 총 혜택액이 아니라 "회비 vs 내가 아끼는 돈"을 머릿속으로 즉시 계산하고, 그 답이 "이득"이어야 가입합니다. · 배민클럽 정가 3,990원(이벤트 시 1,990원).</div>
+</div>
+<div class="ins">
+  <b>이 원칙이 런드리고패스 가격의 출발점입니다.</b> 회비는 <b>고객이 가장 먼저 비교하는 배송비 1회(3,800원)보다 낮아야</b> 하고, "배송비보다 낮은 회비로 무료배송을 받는다"가 <b>한눈에 계산</b>되어야 합니다.
+</div>
+
+<div class="box">
+  <div class="ct">가격별 평가</div>
+  <table>
+    <thead><tr><th>가격</th><th>고객 인식</th><th>회사 관점</th><th>평가</th></tr></thead>
+    <tbody>
+      <tr class="hl"><td class="lbl">3,300원</td><td>배송비보다 싸다</td><td>손익 방어 ↔ 전환율 균형</td><td><span class="tag t-g">★ 가장 추천</span></td></tr>
+      <tr><td class="lbl">3,500원</td><td>배송비보다 조금 싸다</td><td>손익 안정적</td><td>보수적 대안</td></tr>
+      <tr><td class="lbl">3,800원</td><td>배송비와 같다</td><td>안전하나 매력 약함</td><td>애매</td></tr>
+      <tr><td class="lbl">3,900원</td><td>배송비보다 비싸다</td><td>손익 안전하나 전환율 우려</td><td><span class="tag t-r">비추천</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="ins up">
+  <b>3,300원이면 "한 번만 써도 이득"이 데이터로 성립합니다.</b> 무료배송 1장 사용 시 <b>3,800원 절약 − 회비 3,300원 = +500원</b>.
+  메시지: <b>"배송비보다 낮은 월 3,300원으로 무료배송 + 패스 전용 할인."</b>
+</div>
+<div class="ins am">
+  <b>표기는 "정가 5,900원 → 현재 3,300원"으로.</b> ① 3,300원이 <b>할인된 가격</b>으로 인식돼 매력이 커지고(앵커링), ② <b>나중에 정가(5,900원 · 세특패스 수준)까지 단계적으로 올릴 여지</b>를 확보합니다. 런칭은 3,300원으로 시작합니다.
+</div>
+
+<hr class="part-divider">
+
+<!-- 04 -->
+<div class="part-head">
+  <div class="part-num">Section 03 · 혜택 구조 & 쿠폰 운영</div>
+  <div class="part-title">무료배송 1장 + 10% 1장 + 시즌 쿠폰 — 좁히고, 통제한다</div>
+  <div class="part-desc">"한 번만 써도 가입할 이유"는 주되, <b>혜택 비용은 통제</b>합니다. 쿠폰 중복 불가를 활용해 고객이 상황에 맞는 1장을 고르게 합니다.</div>
+</div>
+
+<div class="box">
+  <div class="ct">추천 혜택 구조</div>
+  <table>
+    <tbody>
+      <tr><td class="lbl">상품명</td><td>런드리고패스</td></tr>
+      <tr class="hl"><td class="lbl">월 회비</td><td><b>정가 5,900원 → 현재 3,300원</b> (런칭가)</td></tr>
+      <tr><td class="lbl">기본 혜택 1</td><td>무료배송 쿠폰 <b>월 1장</b> · <b>주문 금액 조건 없음</b>(저단가 주문에도 사용)</td></tr>
+      <tr><td class="lbl">기본 혜택 2</td><td>세탁비 10% 할인 쿠폰 <b>월 1장</b></td></tr>
+      <tr><td class="lbl">기본 혜택 3</td><td>패스 전용 <b>시즌 쿠폰</b> (월/시즌별 갱신)</td></tr>
+      <tr><td class="lbl">쿠폰 중복 사용</td><td>불가</td></tr>
+      <tr><td class="lbl">혜택 이월</td><td>불가</td></tr>
+      <tr><td class="lbl">핵심 타깃</td><td>자유이용 월 1~2회 고객</td></tr>
+    </tbody>
+  </table>
+  <div class="cn">* 무료배송 쿠폰은 <b>최소 주문 금액 등 허들 없이</b> 어떤 주문에도 사용 — 저단가(19,500원 미만)의 7,600원 배송 벽까지 없애 "한 번 써도 확실한 이득"을 키움(회사는 그만큼 소액 주문 배송을 부담하므로 사용률·증분으로 검증).</div>
+</div>
+
+<div class="ins">
+  <b>쿠폰 중복 불가 = 비용 통제 장치이자 자연스러운 선택권.</b> 고객은 한 주문에서 더 유리한 쿠폰 1장을 고릅니다 — <b>배송비가 큰 주문엔 무료배송, 할인액이 더 큰 주문엔 10%</b>. 그래서 10% 쿠폰을 "2회차 전용"으로 묶을 필요가 낮고, 선택권을 주는 편이 체감 가치가 큽니다. 회사는 중복 불가로 1주문당 1장만 나가게 해 비용을 제어합니다.
+</div>
+
+<hr class="part-divider">
+
+<!-- 05 -->
+<div class="part-head">
+  <div class="part-num">Section 04 · 시즌 쿠폰 & 구독 전환 넛지</div>
+  <div class="part-title">매월 "써야 할 이유" + 구독으로 올려보내는 장치</div>
+  <div class="part-desc">고정 혜택만 두면 신선도가 떨어집니다. 시즌 전용 쿠폰으로 매월 이용 이유를 주고, 빈도가 오른 고객은 구독으로 넛지합니다.</div>
+</div>
+
+<div class="two-col">
+  <div class="box" style="margin:0">
+    <div class="ct">패스 전용 시즌 쿠폰 (예시)</div>
+    <table>
+      <thead><tr><th>시즌</th><th>패스 전용 혜택</th></tr></thead>
+      <tbody>
+        <tr><td class="lbl">3~5월</td><td>봄옷 드라이클리닝 할인</td></tr>
+        <tr><td class="lbl">6~8월</td><td>이불 세탁 할인</td></tr>
+        <tr><td class="lbl">9~10월</td><td>가을 옷 정리 쿠폰</td></tr>
+        <tr><td class="lbl">11~12월</td><td>겨울 의류·보관 연계 혜택</td></tr>
+      </tbody>
+    </table>
+    <div class="cn">* 단순 무료배송권이 아니라 "매월 런드리고를 쓸 이유"를 주는 멤버십으로 확장.</div>
+  </div>
+  <div class="box" style="margin:0">
+    <div class="ct">구독 전환 넛지 (조건 → 메시지)</div>
+    <table>
+      <thead><tr><th>조건</th><th>넛지</th></tr></thead>
+      <tbody>
+        <tr><td class="lbl">패스 2개월 유지</td><td>"최근 2개월 꾸준히 이용하셨네요"</td></tr>
+        <tr><td class="lbl">월 2회 이상</td><td>"이 정도면 구독이 더 유리해요"</td></tr>
+        <tr><td class="lbl">월 세탁비 일정 이상</td><td>"이번 달 기준 구독이 더 경제적"</td></tr>
+        <tr><td class="lbl">패스 3개월 유지</td><td>구독 첫 달 할인·추가 혜택</td></tr>
+      </tbody>
+    </table>
+    <div class="cn">* 핵심 메시지: "패스도 좋지만, 이 정도로 자주 쓰신다면 구독이 더 이득입니다."</div>
+  </div>
+</div>
+
+<div class="ins pu">
+  <b>잠식이 아니라 승급.</b> 시즌 쿠폰으로 패스의 신선도를 유지하고, 빈도·금액이 올라간 고객을 구독으로 자연스럽게 올려보냅니다. 패스는 구독의 대체재가 아니라 <b>구독으로 가는 중간 계단</b>입니다.
+</div>
+
+<hr class="part-divider">
+
+<!-- 06 -->
+<div class="part-head">
+  <div class="part-num">Section 05 · 성과 지표</div>
+  <div class="part-title">가입자 수·회비 매출이 아니라 "행동 변화"로 본다</div>
+  <div class="part-desc">이 상품의 본질은 고객 행동 변화입니다. <b>핵심 지표 3개</b>에 집중하고, 나머지는 보조로만 확인합니다.</div>
+</div>
+
+<div class="box">
+  <div class="ct">목표 퍼널 (5월 기준)</div>
+  <div class="flow-row">
+    <div class="flow-box"><div class="fb-t">~40,000명</div><div class="fb-s">자유이용 유저 (5월)</div></div>
+    <div class="flow-arr">→</div>
+    <div class="flow-box"><div class="fb-t">~28,000명</div><div class="fb-s">월 1회 이용 (약 70%)</div></div>
+    <div class="flow-arr">→</div>
+    <div class="flow-box" style="border:1.5px solid var(--accent)"><div class="fb-t" style="color:var(--accent)">~10,000명</div><div class="fb-s">패스 가입 목표</div></div>
+  </div>
+  <div class="cn">* 5월 자유이용 약 40,000명 × 월 1회 비중 ~70% = 약 28,000명. <b>가입 목표 10,000명</b> = 월 1회 유저의 약 36%(자유이용 전체의 25%) — 도전적 목표.</div>
+</div>
+
+<div class="sec-label" style="border:none;padding:0;margin:22px 0 12px;">핵심 지표 3가지</div>
+<div class="kpi-3">
+  <div class="kc" style="border-top:3px solid var(--accent)">
+    <div class="kc-l">① 패스 가입 수</div>
+    <div class="kc-v blu">~10,000명</div>
+    <div class="kc-s">월 1회 유저(28,000명)의 약 36% · 가입·활성의 1차 지표</div>
+  </div>
+  <div class="kc" style="border-top:3px solid var(--up)">
+    <div class="kc-l">② 패스 가입자 월 1회 비중</div>
+    <div class="kc-v up">~70% → &lt;60%</div>
+    <div class="kc-s">"월 1회 → 2회"를 비중 축소로 측정(직접 전환율 대신)</div>
+  </div>
+  <div class="kc" style="border-top:3px solid var(--amber)">
+    <div class="kc-l">③ 패스 가입자 월 이탈율</div>
+    <div class="kc-v am">&lt; 15%</div>
+    <div class="kc-s">자유이용 ~27% 대비 — 리텐션 효과</div>
+  </div>
+</div>
+
+<div class="box">
+  <div class="ct">보조 지표 (참고로만 확인)</div>
+  <table>
+    <thead><tr><th>지표</th><th>비고</th></tr></thead>
+    <tbody>
+      <tr><td class="lbl">가입 후 첫 주문 전환율 · 쿠폰(무배/할인) 사용률</td><td>가입 활성의 보조 — 정도만 확인</td></tr>
+      <tr><td class="lbl">패스 → 구독 전환율</td><td>의미 있으나 <b>결과까지 최소 3개월+</b> 걸리는 장기 지표 — 보조</td></tr>
+      <tr><td class="lbl">객단가 변화 · 재구매율 · 혜택 비용 대비 증분 매출</td><td>손익·LTV 보조</td></tr>
+    </tbody>
+  </table>
+  <div class="cn">* 목표치는 가설로, 출시 후 A/B·코호트로 검증·보정. '자유이용 ~27% 이탈'은 직전 자유이용 분석 참고치.</div>
+</div>
+
+<hr class="part-divider">
+
+<!-- 07 -->
+<div class="part-head">
+  <div class="part-num">Section 06 · 최종 제안</div>
+  <div class="part-title">정가 5,900원 → 현재 3,300원 · 무료배송 1장 + 10% 1장 + 시즌 쿠폰</div>
+  <div class="part-desc">고객에겐 "배송비보다 낮은 가격의 멤버십", 회사엔 "비용을 통제하며 반복 이용·구독 전환을 동시에 유도"하는 구조입니다.</div>
+</div>
+
+<div class="kpi-3">
+  <div class="kc" style="border-top:3px solid var(--accent)"><div class="kc-l blu" style="font-weight:600">가격</div><div style="font-size:13px;color:var(--ink-80);line-height:1.8;margin-top:8px">정가 <b>5,900원</b> → 현재 <b>3,300원</b><br>(배송비 3,800보다 낮게)</div></div>
+  <div class="kc" style="border-top:3px solid var(--up)"><div class="kc-l up" style="font-weight:600">혜택</div><div style="font-size:13px;color:var(--ink-80);line-height:1.8;margin-top:8px">무료배송 <b>1장</b> + 10% <b>1장</b> + 패스 전용 시즌 쿠폰<br>쿠폰 중복·이월 불가</div></div>
+  <div class="kc" style="border-top:3px solid var(--purple)"><div class="kc-l pu" style="font-weight:600">운영</div><div style="font-size:13px;color:var(--ink-80);line-height:1.8;margin-top:8px">2~3개월 유지 시 구독 넛지<br>핵심 지표: 월1→2회·구독 전환</div></div>
+</div>
+
+<div class="ins blu">
+  <b>결론.</b> 기존 3,900원 안은 손익 방어엔 안전하지만 <b>배송비(3,800)보다 높아 가입 장벽</b>이 생깁니다. <b>월 3,300원(정가 5,900) + 무료배송 1장 + 10% 1장 + 시즌 쿠폰</b>으로 낮추면 — 고객에겐 "배송비보다 낮은 가격에 한 번만 써도 +500원 이득", 회사엔 "혜택 비용 통제 + 반복 이용·구독 전환 유도"가 됩니다. 손익의 최종 판단은 출시 후 <b>"혜택 비용 대비 증분 매출"</b>로 확인합니다.
+</div>
+
+<div style="margin-top:40px;padding-top:20px;border-top:1px solid var(--hairline);font-size:12px;color:var(--ink-48);line-height:1.7;">
+  런드리고패스 제안서 v1 · 전략 골격은 사내 검토(GPT 정리) 기반, 수치(자유이용 77.6% 월 1회·평균 세탁 38,403원·저단가 재이용 54%·가격 손익)는 2025.01~2026.06 결제 데이터에서 산출. 손익 추정은 마진(공헌이익률) 가정에 따라 달라지며 재무 확정 대상.
+</div>
+
+</div>
+</body>
+</html>
