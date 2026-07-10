@@ -12,10 +12,7 @@ body{background:#fff;color:#1d1d1f;font-family:Pretendard,-apple-system,'Apple S
 .header{background:#fff;border-bottom:1px solid #e8e8ed;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
 .logo{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#2563EB,#7C3AED);display:flex;align-items:center;justify-content:center;font-size:17px}
 .title{margin-left:10px}.title h1{font-size:14px;font-weight:700}.title p{font-size:10px;color:#888;margin-top:1px}
-.sync-btn{background:#2563eb;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:'Noto Sans KR',sans-serif}
-.sync-btn:disabled{background:#ccc;cursor:not-allowed}
-.spin{animation:spin 1s linear infinite;display:inline-block}
-@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+to{transform:rotate(360deg)}}
 .content{padding:20px 24px;max-width:1280px;margin:0 auto}
 
 /* ── 미션 목표 배너 ── */
@@ -73,9 +70,6 @@ body{background:#fff;color:#1d1d1f;font-family:Pretendard,-apple-system,'Apple S
       <p id="st">기준: 2026년 6월 | 자유: [리텐션] 수거신청 기반 | 구독: [리텐션] 구독 수거신청 기반</p>
     </div>
   </div>
-  <button class="sync-btn" id="syncBtn" onclick="doSync()">
-    <span id="si">↻</span><span id="st2">데이터 동기화</span>
-  </button>
 </div>
 
 
@@ -403,38 +397,6 @@ function go(t,btn){
   document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
   btn.classList.add("active");
   render();
-}
-
-// ─── Apps Script 동기화 ─────────────────
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzXtiuOcb0G459YZPa8dy1flWzHcXFEdyL4mtbWh7o8XQHHNW3ESW5RnQPBN_v_0JJo/exec";
-
-async function doSync(){
-  const btn=document.getElementById("syncBtn");
-  const si=document.getElementById("si"),s2=document.getElementById("st2");
-  const stEl=document.getElementById("st");
-  btn.disabled=true;si.className="spin";si.textContent="↻";s2.textContent="동기화 중...";
-  try{
-    const res=await fetch(APPS_SCRIPT_URL);
-    const p=await res.json();
-    if(p.error)throw new Error(p.error);
-    function upd(t,s){if(Array.isArray(s)&&s.length>10){t.length=0;s.forEach(x=>t.push(x));}}
-    if(p.mo_months)upd(MO_MONTHS,p.mo_months);
-    if(p.mo_new)   upd(MO_NEW,   p.mo_new);
-    if(p.mo_d7)    upd(MO_D7,    p.mo_d7);
-    if(p.mo_m1)    upd(MO_M1,    p.mo_m1);
-    if(p.mo_m2)    upd(MO_M2,    p.mo_m2);
-    if(p.sb_m1c)   upd(SB_M1C,   p.sb_m1c);
-    if(p.sb_m2c)   upd(SB_M2C,   p.sb_m2c);
-    if(p.sb_sub)   upd(SB_SUB,   p.sb_sub);
-    if(p.sb_inc)   upd(SB_INC,   p.sb_inc);
-    if(p.mo_rev){upd(MO_REV,p.mo_rev);MO_REV_NET.length=0;MO_REV.forEach(v=>MO_REV_NET.push(+(v/1.1).toFixed(1)));}
-    stEl.textContent=`마지막 업데이트: ${p.updated||new Date().toLocaleString("ko-KR")} ✓`;
-    render();
-  }catch(e){
-    alert("⚠ 동기화 실패: "+e.message);
-    stEl.textContent="동기화 실패 — 기존 데이터 유지";
-  }
-  btn.disabled=false;si.className="";si.textContent="↻";s2.textContent="데이터 동기화";
 }
 
 render();
