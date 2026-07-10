@@ -223,13 +223,6 @@ function renderOv(){
       &nbsp;|&nbsp; 구독자수 26-05 = 23,223명 (5/31 실측값) / 26-06 = 20,003명 | 기준: 2026년 6월
     </div>
 
-    <div class="kpi-row">
-      ${kpiHtml("신규 가입자",num(curNew),mName(MO_MONTHS[kpiMo]),`vs ${mName(MO_MONTHS[kpiMo-1]||MO_MONTHS[0])}`,dlt(curNew,prevNew,"명"),"#2563EB")}
-      ${kpiHtml("자유 가입→3회차 (M2/M0)",pct(curM2),m2mo,"최근 완성 코호트",null,"#F59E0B")}
-      ${kpiHtml("구독자 수",num(SB_SUB[kpiMo]),mName(MO_MONTHS[kpiMo]),`순증 ${SB_INC[kpiMo]>=0?"+":""}${num(SB_INC[kpiMo])}명`,dlt(SB_SUB[kpiMo],SB_SUB[kpiMo-1],"명"),"#7C3AED")}
-      ${kpiHtml("월 매출 (부가세 제외)",bil(MO_REV_NET[kpiMo]),mName(MO_MONTHS[kpiMo]),`결제액 ${bil(MO_REV[kpiMo])} (÷1.1)`,dlt(MO_REV_NET[kpiMo],MO_REV_NET[kpiMo-1],"백만원"),"#0D9488")}
-    </div>
-
     <div class="mission-row">
       ${missionHtml("Mission 2 — 자유 가입→3회차 전환율",curM2,TARGETS.자유b,TARGETS.자유t,"#F59E0B",m2mo)}
       ${missionHtml("Mission 1 — 구독 3개월 유지율 (M+2)",lm2&&lm2>10?lm2:null,TARGETS.구독b,TARGETS.구독t,"#2563EB",m2sbmo)}
