@@ -75,6 +75,7 @@ to{transform:rotate(360deg)}}
 
 <div style="padding:0 20px;background:#fff;border-bottom:1px solid #EBEDF0;display:flex">
   <button class="tab-btn active" id="tab-ov" onclick="go('ov',this)">📊 개요</button>
+  <button class="tab-btn" id="tab-tr" onclick="go('tr',this)">📈 트렌드 (YoY)</button>
 </div>
 <div class="content" id="content"></div>
 
@@ -124,6 +125,24 @@ const WK_FR2_PY    = WK_FR2_PY_WK.map((v,i)=>v??WK_FR2_PY_MO[i]);  // 합산
 // 자유 2회차율 D30 — 당해(CY 2025-12-01 ~ 2026-05-25), 최근 3주 null
 const WK_FR2  = [25.3,26.8,24.8,25.4,26.5,26.3,27.3,30.2,26.9,25.5,26.8,28.7,26.2,31.1,31.5,28.4,27.4,27.1,27.4,24.8,24.8,25.1,23.8,22.0,23.1,23.7,20.7,23.4,19.1];
 
+
+
+// ── 주간 YoY 데이터 (2025·2026, 엑셀 Weekly값.T 시트 원본) ─────────────────
+// PY: 2025.1.6~12.29 (52주) / CY: 2026.1.5~7.6 (27주, 7/13 부분데이터 제외)
+const PY_LBL=["1/6","1/13","1/20","1/27","2/3","2/10","2/17","2/24","3/3","3/10","3/17","3/24","3/31","4/7","4/14","4/21","4/28","5/5","5/12","5/19","5/26","6/2","6/9","6/16","6/23","6/30","7/7","7/14","7/21","7/28"];
+const CY_LBL=["1/5","1/12","1/19","1/26","2/2","2/9","2/16","2/23","3/2","3/9","3/16","3/23","3/30","4/6","4/13","4/20","4/27","5/4","5/11","5/18","5/25","6/1","6/8","6/15","6/22","6/29","7/6"];
+const PY_NEW=[2331,2185,1747,1894,2208,2389,2481,3033,3544,4644,4567,5188,8003,6685,5867,7001,3791,3270,3903,3363,2625,2568,2555,2935,2657,2559,2160,2082,1912,2087];
+const CY_NEW=[3632,3369,3994,3680,3560,2955,3506,3987,3400,3415,3822,4423,4805,4363,4732,4144,3361,3166,3365,3119,3459,3718,2630,2552,2841,3200,3091];
+const PY_PICKUP=[1193,1135,919,846,1113,1093,1122,1342,1581,1889,1793,1895,2055,2186,2201,3592,2063,1864,1894,1846,1562,1466,1378,1458,1237,1200,1114,1087,1033,1050];
+const CY_PICKUP=[1680,1616,1885,1778,1681,1234,1561,1998,1724,1790,1895,2349,2481,2048,2421,1953,1679,1637,1715,1590,1735,1844,1370,1364,1293,1405,1287];
+const PY_D7=[33.8,34.4,32.7,32.8,34.9,33.9,31.9,30.5,32.4,28.9,27.7,27.0,19.4,22.8,27.0,26.2,32.0,34.9,33.4,36.8,36.3,37.1,34.2,32.0,31.7,29.8,33.5,31.7,32.4,33.2];
+const CY_D7=[33.9,34.7,35.3,34.0,34.0,28.7,34.6,34.2,34.9,35.4,34.0,37.8,36.0,34.3,36.6,32.9,34.2,35.6,34.5,36.2,34.2,36.4,33.3,36.6,32.2,30.7,26.9];
+const PY_WAU=[9658,9075,9895,4992,10014,8909,9063,9456,9540,11449,10987,11897,11461,11695,12414,12995,13913,11915,11304,11358,11747,10072,10151,10412,9843,9752,9505,8875,10512,9482];
+const CY_WAU=[10371,10533,10178,10850,10424,10580,6537,10806,10974,10505,11450,12306,13224,13496,13580,14745,11870,11053,11056,11757,12457,11804,10788,10106,10699,10580,9995];
+const PY_SUB=[468,432,306,360,421,393,439,487,601,649,946,1003,1110,1119,1206,1266,953,997,902,936,798,856,702,555,433,480,394,379,319,294];
+const CY_SUB=[593,548,553,569,585,472,690,777,773,802,758,867,997,717,945,674,533,508,462,358,420,402,352,349,333,406,365];
+const PY_CANCEL=[510,504,505,422,471,437,414,398,375,409,442,952,649,695,773,856,959,936,1086,1151,1044,1024,896,957,851,821,750,686,649,651];
+const CY_CANCEL=[546,505,489,555,542,557,517,520,522,480,556,547,535,557,536,748,819,745,876,789,778,1116,1063,1054,1001,629,248];
 const GC="rgba(0,0,0,0.04)",TC="#94A3B8";
 let charts={};
 
@@ -383,6 +402,95 @@ function renderOv(){
   }
 }  // end renderOv
 
+
+
+// ─── 트렌드 탭 렌더 ─────────────────────────────────────────────────────────
+function renderTrend(){
+  const el=document.getElementById("content");
+  const N=Math.max(PY_LBL.length,CY_LBL.length);
+  // x축: 1~52 (주 번호), CY는 27주까지만 채움
+  const XLBL=PY_LBL; // 52주 기준
+  // CY 패딩 (52주에 맞게 null 채우기)
+  function pad(a,n){const r=[...a];while(r.length<n)r.push(null);return r;}
+
+  const metrics=[
+    {key:'new',   label:'신규 가입자수',          unit:'명',   color:'#2563EB', py:PY_NEW,   cy:CY_NEW,   isRate:false,
+     insight:'⚠ 25년 4월 급등: 리워드 매체 테스트 집행으로 가입자 수 급증 — 단, 실제 주문 전환까지 이어지지 않아 전환율 지표에 동반 하락.'},
+    {key:'pick',  label:'첫 수거신청자수',          unit:'명',   color:'#0D9488', py:PY_PICKUP,cy:CY_PICKUP,isRate:false,
+     insight:null},
+    {key:'d7',    label:'첫주문 전환율 (D+7)',       unit:'%',    color:'#16A34A', py:PY_D7,    cy:CY_D7,    isRate:true,
+     insight:'⚠ 25년 4월 급락: 리워드 매체 유입 가입자 증가로 전환율 하락 (비구매 의도 유저 다수). 전환율은 이후 회복됨.'},
+    {key:'wau',   label:'주 활성유저수 (WAU)',       unit:'명',   color:'#7C3AED', py:PY_WAU,   cy:CY_WAU,   isRate:false,
+     insight:null},
+    {key:'sub',   label:'구독 가입자수 (신규+기존)', unit:'명',   color:'#F97316', py:PY_SUB,   cy:CY_SUB,   isRate:false,
+     insight:'📌 구조적 감소: 플러스구독 출시 및 1회성 어뷰징 방지를 위한 가격 체계 개편. 성수기 단기 가입 최소화 의도 — 해지율 개선 효과 기대.'},
+    {key:'cancel',label:'구독 해지자수',            unit:'명',   color:'#DC2626', py:PY_CANCEL,cy:CY_CANCEL,isRate:false,
+     insight:'⚠ 26년 4~5월 해지자수 급증: 손익 영향이 큰 와이셔츠&드라이 요금제 마이그레이션 집행. 해당 유저 플러스구독으로 윈백 캠페인 진행 중.'},
+  ];
+
+  // 6월 대비 YoY 뱃지 (CY vs PY 같은 주차 비교, 6/1주 기준)
+  function yoyBadge(py,cy,isRate,key){
+    // CY_LBL에서 "6/1" 찾기
+    const ci=CY_LBL.indexOf("6/1"); const pi=PY_LBL.indexOf("6/2");
+    if(ci<0||pi<0||!cy[ci]||!py[pi]) return "";
+    const d=cy[ci]-py[pi];
+    const pct=isRate?d.toFixed(1)+"%p":((d/py[pi])*100).toFixed(0)+"%";
+    const good=key==="cancel"?d<0:d>0;
+    const col=good?"#188a4e":"#c93a30";
+    const sign=d>0?"+":"";
+    return `<span style="font-size:10px;padding:1px 5px;border-radius:4px;background:${col}18;color:${col};font-weight:700">${sign}${pct} YoY</span>`;
+  }
+
+  let cards="";
+  metrics.forEach(m=>{
+    const insight=m.insight?`<div style="margin-top:8px;background:#f5f5f7;border-radius:7px;padding:7px 10px;font-size:10.5px;color:#3a3a3c;line-height:1.55">${m.insight}</div>`:'';
+    cards+=`<div class="card">
+      <div class="ct">${m.label} ${yoyBadge(m.py,m.cy,m.isRate,m.key)}</div>
+      <div class="csub">주간 | 회색: 2025 / 컬러: 2026 (7/6까지) | 출처: Weekly값.T</div>
+      <div class="cw" style="height:${m.insight?175:195}px"><canvas id="tr_${m.key}"></canvas></div>
+      ${insight}
+    </div>`;
+  });
+
+  el.innerHTML=`
+    <div style="background:var(--panel);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:11.5px;color:#3a3a3c;line-height:1.6">
+      📅 <b>주간 YoY 트렌드</b> — 2025 vs 2026 주별 비교 | 투자사 격주 미팅용 | 출처: [Weekly값.T] 엑셀 원본
+    </div>
+    <div class="cards-2" style="margin-bottom:14px">${cards}</div>`;
+
+  const CY_N=CY_LBL.length;
+  const base={responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:"#555",font:{size:10,family:"Pretendard"},boxWidth:10,padding:8}},
+             tooltip:{backgroundColor:"#fff",borderColor:"#e8e8ed",borderWidth:1,titleColor:"#333",bodyColor:"#555",padding:7}},
+    scales:{x:{grid:{color:GC},ticks:{color:TC,font:{size:8},maxRotation:45,
+      callback:(v,i)=>((i%4===0)||i===CY_N-1)?XLBL[i]:''
+    }},y:{grid:{color:GC},ticks:{color:TC,font:{size:9}}}}};
+
+  metrics.forEach(m=>{
+    const cyPad=pad(m.cy,XLBL.length);
+    const opts=JSON.parse(JSON.stringify(base));
+    if(m.isRate){
+      opts.scales.y.ticks.callback=v=>v+"%";
+    } else {
+      opts.scales.y.ticks.callback=v=>v>=1000?(v/1000).toFixed(0)+"K":v;
+    }
+    opts.plugins.tooltip.callbacks={
+      label:ctx=>{
+        const v=ctx.parsed.y;
+        if(v==null) return null;
+        return ` ${ctx.dataset.label}: ${m.isRate?v.toFixed(1)+"%":Number(v).toLocaleString("ko-KR")+m.unit}`;
+      }
+    };
+    charts[`tr_${m.key}`]=new Chart(document.getElementById(`tr_${m.key}`),{
+      type:"line",
+      data:{labels:XLBL,datasets:[
+        {label:"PY 2025",data:m.py,borderColor:"#c7c7cc",backgroundColor:"transparent",borderWidth:1.5,pointRadius:0,tension:0.3,spanGaps:true},
+        {label:"CY 2026",data:cyPad,borderColor:m.color,backgroundColor:m.color+"18",fill:true,borderWidth:2.5,pointRadius:2,tension:0.3,spanGaps:false},
+      ]},options:opts
+    });
+  });
+}
+
 // ─── 탭 전환 ───────────────────────────
 let tab="ov";
 function go(t,btn){
@@ -395,6 +503,7 @@ function go(t,btn){
 render();
 function render(){
   kill();
+  if(tab==="tr"){renderTrend();return;}
   renderOv();
 }
 </script>
