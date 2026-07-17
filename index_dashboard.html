@@ -3,7 +3,46 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>핵심지표 대시보드 — 투자사 미팅용</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js">
+// ── 플러스구독 데이터 ─────────────────────────────────────────────────────
+const PLUS_LBL   = ['2월','3월','4월','5월','6월','7월*'];
+const PLUS_V1    = [489,625,0,0,0,0];          // v1 (2월 출시, 런드리고X)
+const PLUS_V2OLD = [0,267,657,428,417,164];     // v2 기존 플랜 (3/20 출시)
+const PLUS_NEW = [0,0,0,0,132,139];           // 와이셔츠&드라이 신규 (6/18)
+const PLUS_LIGHT = [0,0,0,0,44,119];            // 런드리고X 라이트 신규 (6/18)
+const PLUS_D3    = [428,681,399,216,227,180];   // 3개월 계약
+const PLUS_D6    = [61,192,209,171,258,167];    // 6개월 계약
+const PLUS_D12   = [0,19,49,41,108,75];         // 12개월 계약
+const PLUS_LONG  = [12.5,23.7,39.3,49.5,61.7,57.3]; // 6+12개월 장기 비중(%)
+
+// CP1: 월별 가입 현황 (플랜 구분)
+new Chart(document.getElementById('cp1'),{type:'bar',data:{labels:PLUS_LBL,datasets:[
+  {label:'v1 기존 (2월 출시)',data:PLUS_V1,backgroundColor:'rgba(147,197,253,0.85)',borderRadius:3,stack:'p'},
+  {label:'v2 기존 (3/20 출시)',data:PLUS_V2OLD,backgroundColor:'rgba(37,99,235,0.75)',borderRadius:3,stack:'p'},
+  {label:'신규 (6/18 출시)',data:PLUS_NEW,backgroundColor:'rgba(234,88,12,0.85)',borderRadius:3,stack:'p'},
+]},options:{responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{labels:{color:'#555',font:{size:10,family:'Pretendard'},boxWidth:10,padding:8}},
+           tooltip:{backgroundColor:'#fff',borderColor:'#e8e8ed',borderWidth:1,titleColor:'#333',bodyColor:'#555',padding:8}},
+  scales:{x:{stacked:true,grid:{color:GC},ticks:{color:TC,font:{size:10}}},
+          y:{stacked:true,grid:{color:GC},ticks:{color:TC,font:{size:9}}}}}});
+
+// CP2: 기간 구성 (스택바) + 장기 비중 (선)
+new Chart(document.getElementById('cp2'),{type:'bar',data:{labels:PLUS_LBL,datasets:[
+  {type:'bar',label:'3개월',data:PLUS_D3,backgroundColor:'rgba(203,213,225,0.8)',borderRadius:3,stack:'d',yAxisID:'y'},
+  {type:'bar',label:'6개월',data:PLUS_D6,backgroundColor:'rgba(37,99,235,0.6)',borderRadius:3,stack:'d',yAxisID:'y'},
+  {type:'bar',label:'12개월',data:PLUS_D12,backgroundColor:'rgba(30,64,175,0.85)',borderRadius:3,stack:'d',yAxisID:'y'},
+  {type:'line',label:'장기 비중(6+12개월, %)',data:PLUS_LONG,borderColor:'#ea580c',backgroundColor:'transparent',
+   borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#ea580c',tension:0.3,yAxisID:'y2'},
+]},options:{responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{labels:{color:'#555',font:{size:10,family:'Pretendard'},boxWidth:10,padding:8}},
+           tooltip:{backgroundColor:'#fff',borderColor:'#e8e8ed',borderWidth:1,titleColor:'#333',bodyColor:'#555',padding:8}},
+  scales:{
+    x:{stacked:true,grid:{color:GC},ticks:{color:TC,font:{size:10}}},
+    y:{stacked:true,grid:{color:GC},ticks:{color:TC,font:{size:9}},title:{display:false}},
+    y2:{position:'right',grid:{display:false},min:0,max:80,
+        ticks:{color:'#ea580c',font:{size:9},callback:v=>v+'%'}}}}});
+
+</script>
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet"/>
 <style>
 :root{--ink:#1d1d1f;--muted:#6e6e73;--hair:#e8e8ed;--panel:#f5f5f7;--accent:#2563eb;--pos:#188a4e;--neg:#c93a30}
@@ -53,7 +92,7 @@ body{background:#fff;color:var(--ink);font-family:Pretendard,-apple-system,sans-
     <div>📊 <b style="font-size:12px">매출 구조</b></div>
     <div class="eq">
       <b>매출</b> =
-      <b>자유 주문수</b> × <b>자유 객단가</b>
+      <b>MPU</b> × <b>자유 객단가</b>
       <span class="plus">+</span>
       <b>구독자수</b> × <b>구독 ARPU</b>
     </div>
@@ -85,13 +124,13 @@ body{background:#fff;color:var(--ink);font-family:Pretendard,-apple-system,sans-
       <div class="sec-num" style="background:#0d9488">2</div>
       <div>
         <div class="sec-title">활성 & 재이용 (Engagement)</div>
-        <div class="sec-sub">월 활성유저수 · 재주문율 → 자유 매출 볼륨의 핵심 드라이버</div>
+        <div class="sec-sub">MPU(월 활성유저) · 재주문율 → 자유 매출 볼륨의 핵심 드라이버</div>
       </div>
     </div>
     <div class="grid2">
       <div class="card">
-        <div class="ct">월 활성유저수 (MAU)</div>
-        <div class="csub">자유 이용 기반 월 활성유저 | 점선: 추세선</div>
+        <div class="ct">월 활성유저수 (MPU)</div>
+        <div class="csub">1회 이상 수거신청 유저 (자유+구독 합산) | 점선: 추세선</div>
         <div class="cw" style="height:200px"><canvas id="c2"></canvas></div>
       </div>
       <div class="card">
@@ -124,6 +163,32 @@ body{background:#fff;color:var(--ink);font-family:Pretendard,-apple-system,sans-
         <div class="csub">구독자 1인당 월 평균 실결제 금액 (원)</div>
         <div class="cw" style="height:200px"><canvas id="c6"></canvas></div>
         <div class="note">📌 26년 들어 ARPU 상승 — 플러스구독 단가 상승 효과 반영.</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 섹션 3+: 플러스구독 -->
+  <div class="section">
+    <div class="sec-hdr">
+      <div class="sec-num" style="background:#ea580c">↳</div>
+      <div>
+        <div class="sec-title">플러스구독 (Plus Subscription)</div>
+        <div class="sec-sub">v1(2월출시) · v2(3/20출시) · 신규 6/18출시(와이셔츠&amp;드라이, 런드리고X 라이트) | 7월*=1~17일 기준</div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <div class="ct">월별 가입 현황 — 플랜 구분</div>
+        <div class="csub">스택: v1(연파랑) / v2 기존(파랑) / 신규 6/18 출시(주황, 와이셔츠&amp;드라이 + 런드리고X 라이트)</div>
+        <div class="cw" style="height:210px"><canvas id="cp1"></canvas></div>
+        <div class="note">📌 6/18 신규 출시: 와이셔츠&amp;드라이 시그니처 · 런드리고X 라이트. 기존 플랜 대비 빠른 비중 확대 중.</div>
+      </div>
+      <div class="card">
+        <div class="ct">계약기간 구성 &amp; 장기 비중 추이</div>
+        <div class="csub">막대: 3개월(회색)·6개월(파랑)·12개월(진파랑) | 선: 6+12개월 장기 비중(%)</div>
+        <div class="cw" style="height:210px"><canvas id="cp2"></canvas></div>
+        <div class="note">📌 신규 플랜(장기 편중) + 기존 플랜 내 자연선택 이동 효과로 장기 비중 지속 상승.</div>
       </div>
     </div>
   </div>
@@ -177,7 +242,7 @@ body{background:#fff;color:var(--ink);font-family:Pretendard,-apple-system,sans-
 const MO=['24-12','25-01','25-02','25-03','25-04','25-05','25-06','25-07','25-08','25-09','25-10','25-11','25-12','26-01','26-02','26-03','26-04','26-05','26-06'];
 const MO_NEW=[11464,9175,9936,19638,28651,14581,11676,9445,9244,11878,26508,28278,16078,16484,14065,16865,18633,14620,12655];
 const MO_D7=[36.7,33.7,33.1,28.7,24.0,34.8,33.7,32.2,29.8,31.3,30.7,41.1,36.1,34.5,33.1,35.5,34.6,35.3,34.3];
-const MO_MAU=[33723,29450,29196,36070,40977,40299,33043,31839,27804,29035,37941,46634,38611,36008,30928,39528,45725,39262,36109];
+const MO_MAU=[55133,49901,49227,60108,68075,63190,58207,53765,48726,49620,61026,67814,57951,57066,52480,64315,66856,62736,54903];
 // 재주문율 (수거신청 기반 익월 재사용률 — CSV 원본)
 const MO_REORDER=[57.5,57.5,60.2,65.5,60.9,55.9,56.5,58.7,60.7,63.3,64.6,56.6,50.8,56.7,55.1,62.1,56.7,54.4,52.5];
 // 객단가 (무상포인트 제외)
@@ -251,7 +316,7 @@ new Chart(document.getElementById('c1'),{type:'bar',data:{labels:MO,datasets:[
 
 // C2: MAU
 new Chart(document.getElementById('c2'),{type:'line',data:{labels:MO,datasets:[
-  {label:'MAU',data:MO_MAU,borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.08)',fill:true,borderWidth:2.5,pointRadius:2.5,tension:0.3},
+  {label:'MPU (1회이상 수거신청)',data:MO_MAU,borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.08)',fill:true,borderWidth:2.5,pointRadius:2.5,tension:0.3},
   {label:'추세선',data:linReg(MO_MAU),borderColor:'#2563eb',borderDash:[6,3],backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,spanGaps:true}
 ]},options:base({scales:{x:{grid:{color:GC},ticks:{color:TC,font:{size:9},maxRotation:45}},y:{min:20000,grid:{color:GC},ticks:{color:TC,font:{size:9},callback:kfmt}}}})});
 
@@ -301,6 +366,44 @@ new Chart(document.getElementById('c9'),{type:'bar',data:{labels:MO,datasets:[
            tooltip:{...tooltip,callbacks:{label:ctx=>{const v=ctx.parsed.y;return ` ${ctx.dataset.label}: ${(v/100).toFixed(1)}억`}}}},
   scales:{x:{grid:{color:GC},stacked:true,ticks:{color:TC,font:{size:9},maxRotation:45}},
           y:{stacked:true,grid:{color:GC},ticks:{color:TC,font:{size:9},callback:v=>(v/100).toFixed(0)+'억'}}}}});
+
+// ── 플러스구독 데이터 ─────────────────────────────────────────────────────
+const PLUS_LBL   = ['2월','3월','4월','5월','6월','7월*'];
+const PLUS_V1    = [489,625,0,0,0,0];
+const PLUS_V2OLD = [0,267,657,428,417,164];
+const PLUS_NEW   = [0,0,0,0,176,258];  // 신규 6/18 (와이셔츠&드라이 + 런드리고X 라이트 합산)
+const PLUS_D3    = [428,681,399,216,227,180];
+const PLUS_D6    = [61,192,209,171,258,167];
+const PLUS_D12   = [0,19,49,41,108,75];
+const PLUS_LONG  = [12.5,23.7,39.3,49.5,61.7,57.3];
+
+// CP1: 월별 가입 현황
+new Chart(document.getElementById('cp1'),{type:'bar',data:{labels:PLUS_LBL,datasets:[
+  {label:'v1 기존 (2월 출시)',data:PLUS_V1,backgroundColor:'rgba(147,197,253,0.85)',borderRadius:3,stack:'p'},
+  {label:'v2 기존 (3/20 출시)',data:PLUS_V2OLD,backgroundColor:'rgba(37,99,235,0.75)',borderRadius:3,stack:'p'},
+  {label:'신규 (6/18 출시)',data:PLUS_NEW,backgroundColor:'rgba(234,88,12,0.85)',borderRadius:3,stack:'p'},
+]},options:{responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{labels:{color:'#555',font:{size:10,family:'Pretendard'},boxWidth:10,padding:8}},
+           tooltip:{backgroundColor:'#fff',borderColor:'#e8e8ed',borderWidth:1,titleColor:'#333',bodyColor:'#555',padding:8}},
+  scales:{x:{stacked:true,grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#94a3b8',font:{size:10}}},
+          y:{stacked:true,grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#94a3b8',font:{size:9}}}}}});
+
+// CP2: 기간 구성 + 장기 비중
+new Chart(document.getElementById('cp2'),{type:'bar',data:{labels:PLUS_LBL,datasets:[
+  {type:'bar',label:'3개월',data:PLUS_D3,backgroundColor:'rgba(203,213,225,0.8)',borderRadius:3,stack:'d',yAxisID:'y'},
+  {type:'bar',label:'6개월',data:PLUS_D6,backgroundColor:'rgba(37,99,235,0.6)',borderRadius:3,stack:'d',yAxisID:'y'},
+  {type:'bar',label:'12개월',data:PLUS_D12,backgroundColor:'rgba(30,64,175,0.85)',borderRadius:3,stack:'d',yAxisID:'y'},
+  {type:'line',label:'장기 비중(6+12개월, %)',data:PLUS_LONG,borderColor:'#ea580c',backgroundColor:'transparent',
+   borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#ea580c',tension:0.3,yAxisID:'y2'},
+]},options:{responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{labels:{color:'#555',font:{size:10,family:'Pretendard'},boxWidth:10,padding:8}},
+           tooltip:{backgroundColor:'#fff',borderColor:'#e8e8ed',borderWidth:1,titleColor:'#333',bodyColor:'#555',padding:8}},
+  scales:{
+    x:{stacked:true,grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#94a3b8',font:{size:10}}},
+    y:{stacked:true,grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#94a3b8',font:{size:9}}},
+    y2:{position:'right',grid:{display:false},min:0,max:80,
+        ticks:{color:'#ea580c',font:{size:9},callback:v=>v+'%'}}}}});
+
 </script>
 </body>
 </html>
